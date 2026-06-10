@@ -1,0 +1,76 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Control - Anfitrión</title>
+    <link href="{% static 'css/output.css' %}" rel="stylesheet">
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen">
+
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div>
+                <h1 class="text-lg font-bold text-slate-900">Panel de Administración</h1>
+                <p class="text-xs text-slate-500">Gestión de contenido en tiempo real</p>
+            </div>
+
+            <a href="{% url 'download_zip' %}"
+               class="inline-flex items-center space-x-2 bg-slate-950 hover:bg-slate-900 text-white font-medium py-2 px-4 rounded-xl transition shadow-sm text-sm">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                </svg>
+                <span>Descargar todas las fotos (.ZIP)</span>
+            </a>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="mb-6 p-4 bg-slate-900 text-white rounded-xl text-sm font-medium animate-fade-in flex justify-between items-center shadow-sm">
+                    <span>{{ message }}</span>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <div class="mb-6">
+            <p class="text-sm font-medium text-slate-600"> Total del evento: <span class="text-slate-900 font-bold">{{ photos.count }}</span> fotos subidas.</p>
+        </div>
+
+        {% if photos %}
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                {% for photo in photos %}
+                    <div class="group bg-white rounded-xl overflow-hidden border border-slate-200 shadow-sm relative hover:shadow-md transition flex flex-col justify-between">
+
+                        <div class="aspect-square bg-slate-100 overflow-hidden relative">
+                            <img src="{{ photo.image.url }}" alt="Foto del evento" class="w-full h-full object-cover">
+                        </div>
+
+                        <div class="p-3 flex items-center justify-between bg-white border-t border-slate-50">
+                            <span class="text-xs text-slate-400 font-mono">{{ photo.uploaded_at|date:"H:i:s" }}</span>
+
+                            <form method="POST" action="{% url 'delete_photo' photo.id %}" onsubmit="return confirm('¿Estás seguro de que querés eliminar esta foto de la pantalla grande?');">
+                                {% csrf_token %}
+                                <button type="submit" class="p-1.5 text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 rounded-lg transition" title="Eliminar foto">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                    </svg>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="text-center py-16 bg-white rounded-2xl border border-slate-200 p-8">
+                <p class="text-slate-400 text-sm">Aún no se han subido fotos en este evento.</p>
+            </div>
+        {% endif %}
+
+    </main>
+
+</body>
+</html>

@@ -1,0 +1,77 @@
+{% load static %}
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compartí tu foto en el evento</title>
+    <link href="{% static 'css/output.css' %}" rel="stylesheet">
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen flex flex-col justify-between">
+
+    <header class="w-full bg-white border-b border-slate-100 py-4 px-6 text-center shadow-sm">
+        <h1 class="text-xl font-bold tracking-tight text-slate-950">Galería en Vivo</h1>
+        <p class="text-xs text-slate-500 mt-0.5">Subí tu captura a la pantalla del salón</p>
+    </header>
+
+    <main class="flex-grow flex items-center justify-center p-4 max-w-md mx-auto w-full">
+        <div class="bg-white w-full rounded-2xl shadow-sm border border-slate-100 p-6 md:p-8">
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="mb-6 p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl text-sm font-medium text-center animate-fade-in">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <form method="POST" enctype="multipart/form-data" class="space-y-6">
+                {% csrf_token %}
+
+                <div class="flex flex-col items-center justify-center border-2 border-dashed border-slate-200 rounded-xl p-8 bg-slate-50/50 hover:bg-slate-50 transition relative">
+                    <svg class="w-12 h-12 text-slate-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    </svg>
+
+                    <span class="text-sm font-medium text-slate-600 text-center">Presioná para abrir la cámara</span>
+                    <span class="text-xs text-slate-400 mt-1">O seleccioná desde tu galería</span>
+
+                    <input type="file" name="image" accept="image/*" capture="camera" required
+                           class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                </div>
+
+                <button type="submit"
+                        class="w-full bg-slate-950 hover:bg-slate-900 text-white font-medium py-3 px-4 rounded-xl transition shadow-sm text-sm focus:outline-none focus:ring-2 focus:ring-slate-950 focus:ring-offset-2">
+                    Enviar a la pantalla grande
+                </button>
+            </form>
+
+        </div>
+    </main>
+
+    <footer class="py-4 text-center text-xs text-slate-400">
+        <p>&copy; 2026 - Galería Interactiva</p>
+    </footer>
+<script>
+        const fileInput = document.querySelector('input[type="file"]');
+        const mainText = document.querySelector('.text-slate-600');
+        const subText = document.querySelector('.text-slate-400');
+        const icon = document.querySelector('svg');
+
+        fileInput.addEventListener('change', function(e) {
+            if (e.target.files.length > 0) {
+                // Cambiamos el texto y el color para confirmar
+                mainText.textContent = '¡Foto lista para enviar!';
+                mainText.classList.add('text-emerald-600', 'font-bold');
+
+                subText.textContent = e.target.files[0].name;
+
+                // Cambiamos el icono por un tilde de éxito
+                icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>';
+                icon.classList.remove('text-slate-400');
+                icon.classList.add('text-emerald-500');
+            }
+        });
+    </script>
+</body>
+</html>
