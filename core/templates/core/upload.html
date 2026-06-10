@@ -6,12 +6,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ event_name }} - En Vivo</title>
     <link href="{% static 'css/output.css' %}" rel="stylesheet">
+    <style>
+        /* Micro-animaciones personalizadas */
+        @keyframes modalPop {
+            0% { transform: scale(0.95); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .animate-modal-pop {
+            animation: modalPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        .fade-out {
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+    </style>
 </head>
 
-<body class="min-h-screen flex flex-col bg-gradient-to-br from-pink-500 via-fuchsia-500 to-orange-400 font-sans antialiased">
+<body class="min-h-screen flex flex-col bg-gradient-to-br from-pink-500 via-fuchsia-500 to-orange-400 font-sans antialiased selection:bg-white selection:text-pink-500">
 
     <!-- Fondo decorativo -->
-    <div class="fixed inset-0 overflow-hidden -z-10">
+    <div class="fixed inset-0 overflow-hidden pointer-events-none -z-10">
         <div class="absolute -top-20 -left-20 w-72 h-72 bg-white/20 rounded-full blur-3xl"></div>
         <div class="absolute top-1/3 -right-20 w-80 h-80 bg-yellow-300/20 rounded-full blur-3xl"></div>
         <div class="absolute -bottom-24 left-1/3 w-96 h-96 bg-purple-700/20 rounded-full blur-3xl"></div>
@@ -21,17 +35,22 @@
     {% if messages %}
         {% for message in messages %}
             {% if message.tags == 'success' %}
-                <div id="success-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
-                    <div class="w-full max-w-sm bg-white rounded-[28px] shadow-2xl overflow-hidden text-center">
+                <div id="success-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4 transition-opacity duration-300">
+                    <div class="animate-modal-pop w-full max-w-sm bg-white rounded-[28px] shadow-2xl overflow-hidden text-center">
 
-                        <div class="bg-gradient-to-br from-pink-500 via-fuchsia-500 to-orange-400 px-6 py-8 text-white">
+                        <div class="bg-gradient-to-br from-pink-500 via-fuchsia-500 to-orange-400 px-6 py-8 text-white relative">
+                            <!-- Botón cerrar (X) opcional arriba a la derecha -->
+                            <button onclick="closeSuccessModal()" class="absolute top-4 right-4 text-white/70 hover:text-white transition">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                            </button>
+
                             <div class="w-20 h-20 mx-auto bg-white/20 rounded-full flex items-center justify-center border border-white/30 shadow-lg">
                                 <svg class="w-11 h-11 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.4" d="M5 13l4 4L19 7"></path>
                                 </svg>
                             </div>
 
-                            <h2 class="mt-4 text-2xl font-extrabold">
+                            <h2 class="mt-4 text-2xl font-extrabold tracking-tight">
                                 ¡Foto subida con éxito!
                             </h2>
 
@@ -40,27 +59,27 @@
                             </p>
                         </div>
 
-                        <div class="px-6 py-6">
-                            <p class="text-xs uppercase tracking-widest text-slate-400 font-bold">
+                        <div class="px-6 py-6 bg-slate-50">
+                            <p class="text-[10px] uppercase tracking-widest text-slate-400 font-extrabold mb-1">
                                 Servicio desarrollado por
                             </p>
 
-                            <h3 class="mt-2 text-lg font-extrabold text-slate-900">
+                            <h3 class="text-lg font-extrabold text-slate-900 leading-none">
                                 Franco Pioli
                             </h3>
 
-                            <p class="mt-1 text-sm font-semibold bg-gradient-to-r from-pink-500 via-fuchsia-500 to-orange-400 bg-clip-text text-transparent">
+                            <p class="mt-1 text-sm font-bold bg-gradient-to-r from-pink-500 via-fuchsia-500 to-orange-400 bg-clip-text text-transparent">
                                 Creativo Soluciones Tecnológicas
                             </p>
 
-                            <p class="mt-3 text-sm text-slate-500 leading-relaxed">
+                            <p class="mt-3 text-sm text-slate-500 leading-relaxed font-medium">
                                 Sistemas web, páginas para eventos, automatizaciones y soluciones digitales a medida.
                             </p>
 
-                            <div class="mt-5 grid grid-cols-1 gap-3">
+                            <div class="mt-6 grid grid-cols-1 gap-3">
                                 <a href="https://wa.me/5493572615255"
                                    target="_blank"
-                                   class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 px-4 rounded-2xl transition shadow-md flex items-center justify-center gap-2">
+                                   class="w-full bg-[#25D366] hover:bg-[#20b858] text-white font-bold py-3.5 px-4 rounded-2xl transition shadow-md flex items-center justify-center gap-2 active:scale-[0.98]">
                                     <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                                         <path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56a.977.977 0 00-1.01.24l-2.2 2.2a15.045 15.045 0 01-6.59-6.59l2.2-2.21a.96.96 0 00.25-1.02c-.36-1.11-.56-2.3-.56-3.53 0-.54-.45-.99-.99-.99H4.19c-.54 0-1 .45-1 .99C3.19 15.66 11.66 24.13 20.81 24.13c.54 0 .99-.45.99-1v-6.75c0-.55-.45-.99-.99-.99z"/>
                                     </svg>
@@ -69,7 +88,7 @@
 
                                 <button type="button"
                                         onclick="closeSuccessModal()"
-                                        class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3 px-4 rounded-2xl transition">
+                                        class="w-full bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-3.5 px-4 rounded-2xl transition active:scale-[0.98]">
                                     Subir otra foto
                                 </button>
                             </div>
@@ -81,21 +100,22 @@
     {% endif %}
 
     <header class="w-full pt-8 pb-4 px-4 text-center text-white">
-        <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight drop-shadow-sm">
+        <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight drop-shadow-md">
             {{ event_name }}
         </h1>
-        <p class="text-sm md:text-base text-white/90 mt-1 font-medium">
+        <p class="text-sm md:text-base text-white/90 mt-2 font-medium drop-shadow-sm">
             Subí tu foto y aparecé en la pantalla del salón
         </p>
     </header>
 
-    <main class="flex-grow flex items-center justify-center px-4 py-6">
-        <div class="w-full max-w-md bg-white/95 backdrop-blur-xl rounded-[28px] shadow-2xl border border-white/50 p-6 md:p-8">
+    <main class="flex-grow flex items-center justify-center px-4 py-4">
+        <div class="w-full max-w-md bg-white/95 backdrop-blur-xl rounded-[32px] shadow-2xl border border-white/60 p-6 md:p-8">
 
             {% if messages %}
                 {% for message in messages %}
                     {% if message.tags == 'error' %}
-                        <div class="mb-5 p-4 rounded-2xl text-sm font-semibold text-center border bg-red-50 text-red-700 border-red-200">
+                        <div class="mb-5 p-4 rounded-2xl text-sm font-semibold text-center border bg-red-50 text-red-700 border-red-200 flex items-center justify-center gap-2">
+                            <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                             {{ message }}
                         </div>
                     {% endif %}
@@ -103,8 +123,8 @@
             {% endif %}
 
             <div class="text-center mb-6">
-                <div class="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-pink-500 via-fuchsia-500 to-orange-400 p-[2px] shadow-lg">
-                    <div class="w-full h-full bg-white rounded-2xl flex items-center justify-center">
+                <div class="w-16 h-16 mx-auto rounded-[20px] bg-gradient-to-br from-pink-500 via-fuchsia-500 to-orange-400 p-[2px] shadow-lg">
+                    <div class="w-full h-full bg-white rounded-[18px] flex items-center justify-center">
                         <svg class="w-7 h-7 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
@@ -112,10 +132,10 @@
                     </div>
                 </div>
 
-                <h2 class="mt-4 text-xl font-bold text-slate-800">
+                <h2 class="mt-4 text-xl font-extrabold text-slate-800">
                     Compartí tu momento
                 </h2>
-                <p class="mt-1 text-sm text-slate-500">
+                <p class="mt-1 text-sm text-slate-500 font-medium">
                     Completá tus datos y subí tu foto
                 </p>
             </div>
@@ -125,7 +145,7 @@
 
                 <div class="grid grid-cols-3 gap-3">
                     <div class="col-span-2">
-                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">
+                        <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1.5 ml-1">
                             Tu nombre
                         </label>
                         <input
@@ -134,12 +154,12 @@
                             placeholder="Ej: Carlos"
                             required
                             autocomplete="name"
-                            class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-pink-400 transition"
+                            class="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-4 py-3 text-sm text-slate-800 font-medium placeholder-slate-400 focus:outline-none focus:bg-white focus:ring-4 focus:ring-pink-500/10 focus:border-pink-400 transition-all"
                         >
                     </div>
 
                     <div>
-                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">
+                        <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1.5 ml-1 text-center">
                             Mesa
                         </label>
                         <input
@@ -148,29 +168,41 @@
                             placeholder="Ej: 12"
                             required
                             inputmode="numeric"
-                            class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-3 py-3 text-sm text-slate-800 text-center placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition"
+                            class="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-3 py-3 text-sm text-slate-800 font-medium text-center placeholder-slate-400 focus:outline-none focus:bg-white focus:ring-4 focus:ring-orange-400/10 focus:border-orange-400 transition-all"
                         >
                     </div>
                 </div>
 
                 <div class="relative">
-                    <label for="image-input" class="block">
-                        <div class="group flex flex-col items-center justify-center border-2 border-dashed border-pink-200 hover:border-pink-400 rounded-[24px] p-8 bg-gradient-to-br from-pink-50 via-white to-orange-50 transition cursor-pointer text-center">
+                    <label for="image-input" class="block outline-none" tabindex="0" id="drop-area" aria-label="Subir foto">
+                        <div class="group flex flex-col items-center justify-center border-2 border-dashed border-pink-200 hover:border-pink-400 hover:bg-pink-50/50 rounded-[24px] p-8 bg-slate-50 transition-all cursor-pointer text-center relative overflow-hidden">
 
-                            <div id="upload-icon" class="w-16 h-16 bg-gradient-to-br from-pink-500 via-fuchsia-500 to-orange-400 rounded-2xl flex items-center justify-center shadow-md transition group-hover:scale-105">
-                                <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                </svg>
+                            <!-- Vista Previa (Oculta por defecto) -->
+                            <div id="preview-container" class="absolute inset-0 z-10 hidden bg-black">
+                                <img id="preview-image" src="" alt="Vista previa" class="w-full h-full object-cover opacity-80">
+                                <div class="absolute inset-0 flex flex-col items-center justify-center opacity-0 hover:opacity-100 bg-black/40 transition-opacity backdrop-blur-sm">
+                                    <svg class="w-8 h-8 text-white mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                                    <span class="text-white font-bold text-sm">Cambiar foto</span>
+                                </div>
                             </div>
 
-                            <span id="label-principal" class="mt-4 text-base font-bold text-slate-800">
-                                Tomar o subir foto
-                            </span>
+                            <!-- Estado Inicial -->
+                            <div id="upload-content" class="relative z-0 flex flex-col items-center">
+                                <div id="upload-icon" class="w-16 h-16 bg-gradient-to-br from-pink-500 via-fuchsia-500 to-orange-400 rounded-[20px] flex items-center justify-center shadow-md transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3">
+                                    <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                    </svg>
+                                </div>
 
-                            <span id="label-secundario" class="text-sm text-slate-500 mt-1">
-                                Podés usar la cámara o elegir una imagen desde tu galería
-                            </span>
+                                <span id="label-principal" class="mt-4 text-base font-extrabold text-slate-800">
+                                    Tomar o subir foto
+                                </span>
+
+                                <span id="label-secundario" class="text-sm font-medium text-slate-500 mt-1 px-4">
+                                    Usá la cámara o elegí desde tu galería
+                                </span>
+                            </div>
                         </div>
                     </label>
 
@@ -185,90 +217,107 @@
                     >
                 </div>
 
-                <div id="preview-container" class="hidden rounded-[24px] overflow-hidden border border-slate-200 bg-slate-100">
-                    <img id="preview-image" src="" alt="Vista previa" class="w-full max-h-80 object-cover">
-                </div>
-
                 <button
                     type="submit"
                     id="submit-button"
-                    class="w-full bg-gradient-to-r from-pink-500 via-fuchsia-500 to-orange-400 hover:opacity-95 text-white font-extrabold py-3.5 px-4 rounded-2xl transition duration-300 shadow-lg tracking-wide text-sm active:scale-[0.98]"
+                    class="relative w-full bg-slate-900 hover:bg-slate-800 text-white font-extrabold py-4 px-4 rounded-2xl transition-all duration-300 shadow-xl shadow-slate-900/20 tracking-wide text-sm active:scale-[0.98] overflow-hidden flex items-center justify-center gap-2 group"
                 >
-                    Publicar en Pantalla
+                    <!-- Hover Effect Background -->
+                    <div class="absolute inset-0 bg-gradient-to-r from-pink-500 via-fuchsia-500 to-orange-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-0"></div>
+
+                    <!-- Spinner SVG (Oculto por defecto) -->
+                    <svg id="btn-spinner" class="animate-spin hidden w-5 h-5 text-white z-10" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+
+                    <span id="btn-text" class="relative z-10">Publicar en Pantalla</span>
                 </button>
             </form>
         </div>
     </main>
 
     <footer class="w-full px-4 pb-6 pt-2 text-center text-white">
-        <p class="text-white/80 text-xs font-medium">Desarrollado por</p>
-        <p class="font-bold mt-1">
+        <p class="text-white/80 text-xs font-semibold uppercase tracking-wider">Desarrollado por</p>
+        <p class="font-extrabold mt-1 text-sm">
             Franco Pioli —
-            <span class="text-white">Creativo Soluciones Tecnológicas</span>
+            <span class="text-white/90 font-medium">Creativo Soluciones Tecnológicas</span>
         </p>
 
-        <div class="flex items-center justify-center gap-1 mt-1 text-sm">
-            <svg class="w-4 h-4 text-emerald-300" fill="currentColor" viewBox="0 0 24 24">
+        <a href="https://wa.me/5493572615255" target="_blank" class="inline-flex items-center justify-center gap-1.5 mt-2 text-sm bg-white/10 hover:bg-white/20 py-1.5 px-3 rounded-full transition-colors backdrop-blur-sm">
+            <svg class="w-4 h-4 text-emerald-400" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56a.977.977 0 00-1.01.24l-2.2 2.2a15.045 15.045 0 01-6.59-6.59l2.2-2.21a.96.96 0 00.25-1.02c-.36-1.11-.56-2.3-.56-3.53 0-.54-.45-.99-.99-.99H4.19c-.54 0-1 .45-1 .99C3.19 15.66 11.66 24.13 20.81 24.13c.54 0 .99-.45.99-1v-6.75c0-.55-.45-.99-.99-.99z"/>
             </svg>
-            <a href="https://wa.me/5493572615255" target="_blank" class="hover:underline">
-                3572615255
-            </a>
-        </div>
+            <span class="font-bold">3572 615255</span>
+        </a>
     </footer>
 
     <script>
         const fileInput = document.getElementById('image-input');
-        const mainText = document.getElementById('label-principal');
-        const subText = document.getElementById('label-secundario');
-        const iconContainer = document.getElementById('upload-icon');
+        const dropArea = document.getElementById('drop-area');
+        const uploadContent = document.getElementById('upload-content');
         const previewContainer = document.getElementById('preview-container');
         const previewImage = document.getElementById('preview-image');
-        const submitButton = document.getElementById('submit-button');
-        const form = document.getElementById('upload-form');
 
+        const submitButton = document.getElementById('submit-button');
+        const btnText = document.getElementById('btn-text');
+        const btnSpinner = document.getElementById('btn-spinner');
+        const form = document.getElementById('upload-form');
+        const successModal = document.getElementById('success-modal');
+
+        // Permite abrir el selector de archivos con la tecla Enter por accesibilidad
+        dropArea.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                fileInput.click();
+            }
+        });
+
+        // Cierre suave del modal
         function closeSuccessModal() {
-            const modal = document.getElementById('success-modal');
-            if (modal) {
-                modal.classList.add('hidden');
+            if (successModal) {
+                successModal.classList.add('fade-out');
+                setTimeout(() => {
+                    successModal.style.display = 'none';
+                }, 300); // Mismo tiempo que la duración de la transición
             }
         }
 
+        // Manejo de la selección de imagen y vista previa integrada
         fileInput.addEventListener('change', function(e) {
             const file = e.target.files[0];
 
-            if (!file) return;
-
-            if (!file.type.startsWith('image/')) {
-                mainText.textContent = 'Archivo no válido';
-                mainText.className = 'mt-4 text-base font-bold text-red-600';
-                subText.textContent = 'Seleccioná una imagen válida';
-                subText.className = 'text-sm text-slate-500 mt-1';
+            if (!file) {
                 previewContainer.classList.add('hidden');
+                uploadContent.classList.remove('opacity-0');
                 return;
             }
 
-            mainText.textContent = '¡Foto seleccionada!';
-            mainText.className = 'mt-4 text-base font-bold text-emerald-600';
-            subText.textContent = file.name;
-            subText.className = 'text-sm text-slate-500 mt-1';
-
-            iconContainer.className = 'w-16 h-16 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-2xl flex items-center justify-center shadow-md';
-            iconContainer.innerHTML = `
-                <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                </svg>
-            `;
+            if (!file.type.startsWith('image/')) {
+                alert('Por favor, seleccioná un archivo de imagen válido.');
+                fileInput.value = '';
+                previewContainer.classList.add('hidden');
+                uploadContent.classList.remove('opacity-0');
+                return;
+            }
 
             const imageUrl = URL.createObjectURL(file);
             previewImage.src = imageUrl;
+
+            // Ocultar contenido por defecto y mostrar imagen ajustada a la caja
+            uploadContent.classList.add('opacity-0');
             previewContainer.classList.remove('hidden');
         });
 
+        // Estado de carga al enviar el formulario
         form.addEventListener('submit', function() {
             submitButton.disabled = true;
-            submitButton.textContent = 'Subiendo foto...';
-            submitButton.className = 'w-full bg-slate-400 text-white font-extrabold py-3.5 px-4 rounded-2xl shadow-lg tracking-wide text-sm opacity-80 cursor-not-allowed';
+            btnText.textContent = 'Subiendo...';
+            btnSpinner.classList.remove('hidden');
+
+            // Cambiamos el estilo del botón para denotar carga
+            submitButton.classList.remove('bg-slate-900', 'hover:bg-slate-800');
+            submitButton.classList.add('bg-slate-500', 'cursor-not-allowed', 'opacity-90');
         });
     </script>
 
