@@ -1,77 +1,191 @@
 {% load static %}
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Compartí tu foto en el evento</title>
+    <title>{{ event_name }} - En Vivo</title>
     <link href="{% static 'css/output.css' %}" rel="stylesheet">
 </head>
-<body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen flex flex-col justify-between">
 
-    <header class="w-full bg-white border-b border-slate-100 py-4 px-6 text-center shadow-sm">
-        <h1 class="text-xl font-bold tracking-tight text-slate-950">Galería en Vivo</h1>
-        <p class="text-xs text-slate-500 mt-0.5">Subí tu captura a la pantalla del salón</p>
+<body class="bg-gradient-to-b from-slate-900 to-slate-950 text-white font-sans antialiased min-h-screen flex flex-col justify-between">
+
+    <header class="w-full bg-gradient-to-r from-purple-600 via-pink-500 to-amber-500 p-0.5 shadow-lg">
+        <div class="bg-slate-950 py-4 px-6 text-center">
+            <h1 class="text-xl font-extrabold tracking-tight bg-gradient-to-r from-purple-400 via-pink-400 to-amber-400 bg-clip-text text-transparent uppercase">
+                {{ event_name }}
+            </h1>
+            <p class="text-xs text-slate-400 mt-0.5 tracking-wider">
+                Subí tu foto a la pantalla del salón
+            </p>
+        </div>
     </header>
 
     <main class="flex-grow flex items-center justify-center p-4 max-w-md mx-auto w-full">
-        <div class="bg-white w-full rounded-2xl shadow-sm border border-slate-100 p-6 md:p-8">
+        <div class="bg-slate-900/50 backdrop-blur-md w-full rounded-3xl border border-slate-800 p-6 md:p-8 shadow-2xl relative overflow-hidden">
+
+            <div class="absolute -top-10 -left-10 w-32 h-32 bg-purple-600/20 rounded-full blur-2xl"></div>
+            <div class="absolute -bottom-10 -right-10 w-32 h-32 bg-amber-500/10 rounded-full blur-2xl"></div>
 
             {% if messages %}
                 {% for message in messages %}
-                    <div class="mb-6 p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl text-sm font-medium text-center animate-fade-in">
+                    <div class="mb-6 p-4 rounded-2xl text-sm font-medium text-center border relative z-10
+                        {% if message.tags == 'error' %}
+                            bg-red-50 text-red-700 border-red-200
+                        {% else %}
+                            bg-gradient-to-r from-emerald-500/20 to-teal-500/20 border-emerald-500/30 text-emerald-400
+                        {% endif %}
+                    ">
                         {{ message }}
                     </div>
                 {% endfor %}
             {% endif %}
 
-            <form method="POST" enctype="multipart/form-data" class="space-y-6">
+            <form method="POST" enctype="multipart/form-data" class="space-y-5 relative z-10">
                 {% csrf_token %}
 
-                <div class="flex flex-col items-center justify-center border-2 border-dashed border-slate-200 rounded-xl p-8 bg-slate-50/50 hover:bg-slate-50 transition relative">
-                    <svg class="w-12 h-12 text-slate-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                    </svg>
+                <div class="grid grid-cols-3 gap-3">
+                    <div class="col-span-2">
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">
+                            Tu Nombre
+                        </label>
+                        <input type="text"
+                               name="guest_name"
+                               placeholder="Ej: Carlos"
+                               required
+                               autocomplete="name"
+                               class="w-full bg-slate-950/60 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-pink-500 transition">
+                    </div>
 
-                    <span class="text-sm font-medium text-slate-600 text-center">Presioná para abrir la cámara</span>
-                    <span class="text-xs text-slate-400 mt-1">O seleccioná desde tu galería</span>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">
+                            Mesa
+                        </label>
+                        <input type="text"
+                               name="table_number"
+                               placeholder="Ej: 12"
+                               required
+                               inputmode="numeric"
+                               class="w-full bg-slate-950/60 border border-slate-800 rounded-xl px-3 py-2.5 text-sm text-white text-center focus:outline-none focus:border-amber-500 transition">
+                    </div>
+                </div>
 
-                    <input type="file" name="image" accept="image/*" capture="camera" required
+                <div class="group flex flex-col items-center justify-center border-2 border-dashed border-slate-800 hover:border-pink-500/50 rounded-2xl p-8 bg-slate-950/40 hover:bg-slate-950/80 transition relative overflow-hidden">
+
+                    <div id="upload-icon" class="w-14 h-14 bg-gradient-to-tr from-amber-500 via-pink-500 to-purple-600 rounded-2xl p-0.5 mb-3 shadow-md group-hover:scale-105 transition duration-300">
+                        <div class="bg-slate-950 w-full h-full rounded-[14px] flex items-center justify-center">
+                            <svg class="w-6 h-6 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <span id="label-principal" class="text-sm font-semibold tracking-wide text-slate-200">
+                        Tomar o subir foto
+                    </span>
+
+                    <span id="label-secundario" class="text-xs text-slate-500 mt-1 text-center">
+                        Podés usar cámara o elegir desde galería
+                    </span>
+
+                    <input type="file"
+                           id="image-input"
+                           name="image"
+                           accept="image/*"
+                           required
                            class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
                 </div>
 
+                <div id="preview-container" style="display: none;" class="rounded-2xl overflow-hidden border border-slate-800 bg-slate-950/60">
+                    <img id="preview-image"
+                         src=""
+                         alt="Vista previa"
+                         class="w-full object-cover">
+                </div>
+
                 <button type="submit"
-                        class="w-full bg-slate-950 hover:bg-slate-900 text-white font-medium py-3 px-4 rounded-xl transition shadow-sm text-sm focus:outline-none focus:ring-2 focus:ring-slate-950 focus:ring-offset-2">
-                    Enviar a la pantalla grande
+                        id="submit-button"
+                        class="w-full bg-gradient-to-r from-purple-600 via-pink-500 to-amber-500 hover:opacity-95 text-white font-bold py-3 px-4 rounded-xl transition duration-300 shadow-lg tracking-wide text-sm transform active:scale-[0.98]">
+                    Publicar en Pantalla
                 </button>
             </form>
 
         </div>
     </main>
 
-    <footer class="py-4 text-center text-xs text-slate-400">
-        <p>&copy; 2026 - Galería Interactiva</p>
+    <footer class="w-full bg-slate-950 border-t border-slate-900 py-4 px-6 text-center text-xs">
+        <p class="text-slate-500 font-medium tracking-wide">Desarrollado por</p>
+
+        <p class="font-bold text-slate-300 mt-0.5 tracking-wider">
+            Franco Pioli —
+            <span class="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                Creativo Soluciones Tecnológicas
+            </span>
+        </p>
+
+        <div class="flex items-center justify-center space-x-1 mt-1.5 text-slate-400">
+            <svg class="w-3.5 h-3.5 text-emerald-500" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56a.977.977 0 00-1.01.24l-2.2 2.2a15.045 15.045 0 01-6.59-6.59l2.2-2.21a.96.96 0 00.25-1.02c-.36-1.11-.56-2.3-.56-3.53 0-.54-.45-.99-.99-.99H4.19c-.54 0-1 .45-1 .99C3.19 15.66 11.66 24.13 20.81 24.13c.54 0 .99-.45.99-1v-6.75c0-.55-.45-.99-.99-.99z"/>
+            </svg>
+
+            <a href="https://wa.me/5493572615255" target="_blank" class="hover:underline font-mono text-xs">
+                3572615255
+            </a>
+        </div>
     </footer>
-<script>
-        const fileInput = document.querySelector('input[type="file"]');
-        const mainText = document.querySelector('.text-slate-600');
-        const subText = document.querySelector('.text-slate-400');
-        const icon = document.querySelector('svg');
+
+    <script>
+        const fileInput = document.getElementById('image-input');
+        const mainText = document.getElementById('label-principal');
+        const subText = document.getElementById('label-secundario');
+        const iconContainer = document.getElementById('upload-icon');
+        const previewContainer = document.getElementById('preview-container');
+        const previewImage = document.getElementById('preview-image');
+        const submitButton = document.getElementById('submit-button');
 
         fileInput.addEventListener('change', function(e) {
-            if (e.target.files.length > 0) {
-                // Cambiamos el texto y el color para confirmar
-                mainText.textContent = '¡Foto lista para enviar!';
-                mainText.classList.add('text-emerald-600', 'font-bold');
+            const file = e.target.files[0];
 
-                subText.textContent = e.target.files[0].name;
-
-                // Cambiamos el icono por un tilde de éxito
-                icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>';
-                icon.classList.remove('text-slate-400');
-                icon.classList.add('text-emerald-500');
+            if (!file) {
+                return;
             }
+
+            if (!file.type.startsWith('image/')) {
+                mainText.textContent = 'Archivo no válido';
+                mainText.className = "text-sm font-bold text-red-600 tracking-wide";
+                subText.textContent = 'Seleccioná una imagen válida';
+                subText.className = "text-xs text-slate-400 mt-1 text-center";
+                previewContainer.style.display = 'none';
+                return;
+            }
+
+            mainText.textContent = '¡Foto seleccionada!';
+            mainText.className = "text-sm font-bold text-emerald-400 tracking-wide animate-bounce";
+
+            subText.textContent = file.name;
+            subText.className = "text-xs text-slate-400 mt-1 font-mono text-center";
+
+            iconContainer.className = "w-14 h-14 bg-gradient-to-tr from-emerald-500 to-teal-500 rounded-2xl p-0.5 mb-3 shadow-md";
+            iconContainer.innerHTML = `
+                <div class="bg-slate-950 w-full h-full rounded-[14px] flex items-center justify-center">
+                    <svg class="w-6 h-6 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                </div>
+            `;
+
+            const imageUrl = URL.createObjectURL(file);
+            previewImage.src = imageUrl;
+            previewContainer.style.display = 'block';
+        });
+
+        document.querySelector('form').addEventListener('submit', function() {
+            submitButton.disabled = true;
+            submitButton.textContent = 'Subiendo foto...';
+            submitButton.className = "w-full bg-slate-600 text-white font-bold py-3 px-4 rounded-xl transition duration-300 shadow-lg tracking-wide text-sm opacity-50";
         });
     </script>
+
 </body>
 </html>

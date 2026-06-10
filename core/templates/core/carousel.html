@@ -4,72 +4,98 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantalla del Evento</title>
+    <title>Pantalla en Vivo - {{ event_name }}</title>
     <link href="{% static 'css/output.css' %}" rel="stylesheet">
 </head>
-<body class="bg-black h-screen w-screen overflow-hidden flex flex-col items-center justify-center cursor-none relative">
+<body class="bg-black h-screen w-screen overflow-hidden flex flex-col items-center justify-center cursor-none relative font-sans">
 
-    <div id="empty-state" class="text-slate-500 text-xl font-light absolute flex flex-col items-center">
-        <svg class="w-16 h-16 mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <div class="absolute top-6 left-1/2 transform -translate-x-1/2 z-30 bg-slate-950/80 border border-slate-800 backdrop-blur-md px-8 py-3 rounded-2xl shadow-2xl">
+        <h2 class="text-xl font-black uppercase tracking-widest bg-gradient-to-r from-purple-400 via-pink-400 to-amber-400 bg-clip-text text-transparent">{{ event_name }}</h2>
+    </div>
+
+    <div id="empty-state" class="text-slate-600 text-xl font-light absolute flex flex-col items-center z-20">
+        <svg class="w-16 h-16 mb-4 animate-pulse text-pink-500/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
         </svg>
-        <p>Esperando las primeras fotos...</p>
-        <p class="text-sm mt-2">Escaneá el QR para participar</p>
+        <p class="tracking-wide text-slate-300">Escaneá el QR y compartí tu foto</p>
     </div>
 
     <img id="photo-display" src="" alt="Carrusel"
          class="max-h-full max-w-full object-contain transition-opacity duration-1000 opacity-0 z-10">
+
+    <div id="guest-card" class="absolute bottom-6 left-6 z-30 bg-slate-950/80 border border-slate-800 backdrop-blur-lg px-6 py-4 rounded-2xl shadow-2xl flex items-center space-x-4 transition-all duration-500 opacity-0 transform translate-y-4">
+        <div class="w-10 h-10 bg-gradient-to-tr from-purple-600 to-pink-500 rounded-xl flex items-center justify-center font-black text-white text-lg font-mono shadow-inner" id="guest-avatar">
+            I
+        </div>
+        <div>
+            <h3 class="text-white font-extrabold tracking-wide text-base" id="guest-name">Invitado</h3>
+            <p class="text-xs font-semibold text-pink-400 tracking-wider uppercase" id="guest-table">Mesa -</p>
+        </div>
+    </div>
+
+    <div class="absolute bottom-6 right-6 z-30 bg-slate-950/60 border border-slate-900/60 backdrop-blur-md px-5 py-3 rounded-2xl shadow-2xl text-right">
+        <p class="text-[10px] uppercase font-bold tracking-widest text-slate-500">Pantalla provista por</p>
+        <h4 class="text-xs font-black text-slate-200 tracking-wide mt-0.5">Franco Pioli</h4>
+        <p class="text-[11px] font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-amber-400 bg-clip-text text-transparent">Creativo Soluciones Tecnológicas</p>
+        <p class="text-[10px] font-mono text-slate-400 mt-1">Tel: 3572615255</p>
+    </div>
 
     <script>
         let photos = [];
         let currentIndex = 0;
         const display = document.getElementById('photo-display');
         const emptyState = document.getElementById('empty-state');
+        const guestCard = document.getElementById('guest-card');
+        const guestName = document.getElementById('guest-name');
+        const guestTable = document.getElementById('guest-table');
+        const guestAvatar = document.getElementById('guest-avatar');
 
-        // Función para ir a buscar las fotos al backend
         async function fetchPhotos() {
             try {
-                const response = await fetch('/api/photos/');
+                const response = await fetch("{% url 'api_photos' %}");
                 const data = await response.json();
-
                 if (data.photos.length > 0) {
                     photos = data.photos;
-                    emptyState.style.display = 'none'; // Ocultamos el mensaje inicial
+                    emptyState.style.display = 'none';
                 }
             } catch (error) {
-                console.error("Error al obtener las fotos:", error);
+                console.error("Error:", error);
             }
         }
 
-        // Función para cambiar la imagen visible
         function rotatePhotos() {
             if (photos.length === 0) return;
 
-            // 1. Desvanecer la foto actual
+            // Ocultamos foto e info simultáneamente
             display.classList.remove('opacity-100');
             display.classList.add('opacity-0');
+            guestCard.classList.remove('opacity-100', 'translate-y-0');
+            guestCard.classList.add('opacity-0', 'translate-y-4');
 
-            // 2. Esperar a que termine el fade out, cambiar origen y hacer fade in
             setTimeout(() => {
-                display.src = photos[currentIndex].url;
+                const currentPhoto = photos[currentIndex];
 
-                // Mostrar la nueva foto
+                // Actualizamos imagen
+                display.src = currentPhoto.url;
                 display.classList.remove('opacity-0');
                 display.classList.add('opacity-100');
 
-                // Avanzar al siguiente índice (o volver a 0 si llegamos al final)
+                // Actualizamos e inyectamos datos del invitado
+                guestName.textContent = currentPhoto.guest_name;
+                guestTable.textContent = `Mesa ${currentPhoto.table_number}`;
+                guestAvatar.textContent = currentPhoto.guest_name.charAt(0).toUpperCase();
+
+                // Mostramos tarjeta del invitado con transición moderna
+                guestCard.classList.remove('opacity-0', 'translate-y-4');
+                guestCard.classList.add('opacity-100', 'translate-y-0');
+
                 currentIndex = (currentIndex + 1) % photos.length;
-            }, 1000); // Coincide con el 'duration-1000' de Tailwind
+            }, 1000);
         }
 
-        // Ejecución inicial
-        fetchPhotos().then(() => {
-            rotatePhotos();
-        });
-
-        // Configurar los intervalos automáticos
-        setInterval(fetchPhotos, 10000); // Busca fotos nuevas cada 10 segundos
-        setInterval(rotatePhotos, 6000); // Cambia la foto cada 6 segundos
+        fetchPhotos().then(() => { rotatePhotos(); });
+        setInterval(fetchPhotos, 10000);
+        setInterval(rotatePhotos, 7000); // 7 segundos por imagen para dar tiempo a leer los datos
     </script>
 </body>
 </html>
